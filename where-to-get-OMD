@@ -1,6 +1,10 @@
 Here you can download OMD - which is the best way to install Nagios
 Pick the right version for your distro.
+
 http://labs.consol.de/lang/de/nagios/omd-repository/
+
+You'll want a recent version since there's an issue with the JSON data in
+older versions.
 
 for centos/rhel you need the epel or similar repos installed
 
