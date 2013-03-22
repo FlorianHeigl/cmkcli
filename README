@@ -39,12 +39,11 @@ is "good to go".
 
 
 # TODO
-1. add cli
-2. Add comments to all functions
-3. replace strings with constants
-4. add another output
-5. add setup
-6. cover with tests
+1. add cli return codes
+2. Just review add comments to all functions 
+3. add another output
+4. add setup
+5. cover with tests
 
 
 
