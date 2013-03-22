@@ -1,0 +1,95 @@
+README for cmkstatus
+This is *not* a check plugin for check_mk!
+
+
+I needed a script that can be run from the console to query the status 
+of the server I'm logged into.
+This had been one of the 4 pillars in the system health check scripts
+I drafted at $oldjob. It semt obvious to me that such a thing would be 
+very helpful, but the team that was supposed to build them never finished :)
+
+The idea kept nagging me though and ujsing Check_MK this has become a whole lot
+easier.
+
+You can simply run 
+"cmkstatus" and will get a list of all non-OK services on the system you're 
+logged into.
+
+This is achieved using command restricted SSH keys on the nagios host and a 
+miniature wrapper script for deciding if you want the full status or only the 
+issues.
+
+Full status would be informative to see a system overview or to verify that
+the system component you care about is actually being monitored, whereas the
+"default" will just let you know about any issue.
+
+Things to consider:
+caching: Especially with buggy IPMI bmc modules the check_mk agent run time can
+be around 30s.
+I recommend to use the cached results for quicker query times, but the user 
+needs to be aware he'll be seeing a 60s-old result.
+People may use the caching agent already so there's no 100% safety you see a 
+fresh result anyway.
+
+promt: It might be fun to hack this into your bash prompt, would need to 
+have something that updates the status in the background and just displays
+(OK) by default and this would change to (3CRI5WA) in case something breaks.
+
+I think this might be an interesting idea - let the server talk to the admin.
+
+
+
+note to self after initial commit:
+ARGHLIDIOT!
+
+Modify to give return codes!
+
+0 - all services OK  - no output
+1 - connection error - no output? (linux noobs might fall for that :)
+127 remote end issue - no output?
+11-13 wrn cri unk    - output nagios errors
+
+or just 0,1,2,3, 127 255?
+
+
+note about the downtime option:
+one big issue with (automatic) downtimes is they'll always be too short, or too
+long, but rarely ever give the length you need.
+
+interesting options:
+on regular shutdown / reboot trigger a downtime (K01)
+on on successful startup, cancel the downtime(s) (S99)
+
+notes about timing:
+system startup does not mean the system is really up, yet
+reasons are 
+    clusters
+    application startup in background
+    bad startup scripts
+    bad dependencies
+
+the duration of a reboot can be estimated. not exactly, but well enough.
+factors:
+    cpu count
+        multiplies hw init time for ECC checks, vrm calibration, microcode ...
+    amount on memory in gigabytes
+        i.e. HP-UX wastes about 1 min per GB of primary swap size for kernel
+        relocation so it can crash dump
+    hw init:
+        virtualized system
+        pc based server or big iron:
+        pc servers only do very limited hw checks
+        number of pci devices
+    storage:
+        number of disk devices & paths (linux: 1min per 100)
+        (some linux core dev is convinced that multithreaded hw init is impossible because he didnt get it right)
+        connected to a/p disk arrays (+1-10min)
+        OS in use Linux vs. Commercial Unix (+5min linux)
+        san based cluster locking (+2min)
+    
+
+personally, i think it evens out and the key question is just:
+large system (15min) or tiny system (8min) or vm(3min)
+cluster (+4min)
+sysv init or launchd (-3min)
+add 50% of downtime as flex downtime.
