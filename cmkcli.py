@@ -129,6 +129,8 @@ def process(hostname, params, mask_name):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
+    # Host can fallback to os.hostname or something. if you don't have 
+    # matching names in nagios you're just creating extra effort.
     parser.add_argument("--host", type=str, required=True)
     parser.add_argument("--view", type=str, required=True)
     parser.add_argument("--username", type=str, required=True)
@@ -142,6 +144,9 @@ if __name__ == "__main__":
               '_username': opt.username,
               '_secret': opt.password
               }
+    # we gotta make that configurable my server doesn't know yours :)
+    # servername and maybe a /etc/check_mk/cli.cfg (root 400) 
+    # to keep the auth key and stuff
     hostname = 'http://xen02.xenvms.de/mon1git/check_mk/view.py'
     p = process(hostname, params, opt.mask)
     if p:
